@@ -29,7 +29,7 @@ public class UserController {
     public User create(@Valid @RequestBody User user) {
         Optional<String> optionalUserName = Optional.ofNullable(user.getName());
 
-        if(!optionalUserName.isPresent()){
+        if (!optionalUserName.isPresent()) {
             user.setName(user.getLogin());
         }
 
@@ -42,12 +42,11 @@ public class UserController {
 
     @PutMapping
     public User update(@Valid @RequestBody User user) {
-        if(users.containsKey(user.getId()))
-        {
+        if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
             log.debug("Обновлен пользователь: {}", user);
             return user;
-        }else {
+        } else {
             throw new ValidationException("Пользователя с таким айди не существует.");
         }
     }

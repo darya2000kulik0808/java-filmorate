@@ -35,11 +35,11 @@ public class FilmController {
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
-        if(films.containsKey(film.getId())){
+        if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
             log.debug("Обновлен фильм: {}", film);
             return film;
-        }else {
+        } else {
             throw new ValidationException("Фильма с таким айди не существует.");
         }
 

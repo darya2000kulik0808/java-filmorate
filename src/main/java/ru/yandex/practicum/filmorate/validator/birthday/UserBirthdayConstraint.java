@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.validator.birthday;
 
-import ru.yandex.practicum.filmorate.validator.descriptionLength.FilmDescriptionLengthConstraintValidator;
-
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
