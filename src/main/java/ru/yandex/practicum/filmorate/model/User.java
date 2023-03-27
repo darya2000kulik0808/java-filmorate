@@ -11,10 +11,9 @@ import java.time.LocalDate;
 @Data
 public class User {
     private int id;
-    @NotNull(message = "Поле эектронной почты не может быть пустым!")
+    @NotBlank(message = "Поле эектронной почты не может быть пустым!")
     @Email(message = "Неверный формат электронной почты!")
     private String email;
-    @NotNull(message = "Поле \"логин\" обязательно к заполнению.")
     @NotBlank(message = "Поле \"логин\" не может быть пустым.")
     private String login;
     private String name;
