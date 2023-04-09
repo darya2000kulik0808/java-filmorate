@@ -15,11 +15,11 @@ public class UserService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage){
+    public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
-    public void addFriend(long userId, long friendId){
+    public void addFriend(long userId, long friendId) {
         Optional<Set<Long>> optionalUser = Optional.ofNullable(userStorage.findById(userId).getFriends());
         Optional<Set<Long>> optionalFriend = Optional.ofNullable(userStorage.findById(friendId).getFriends());
 
@@ -28,67 +28,67 @@ public class UserService {
             Set<Long> beginningOfFriendList1 = new HashSet<>();
             beginningOfFriendList1.add(friendId);
             userStorage.findById(userId).setFriends(beginningOfFriendList1);
-        }else {
+        } else {
             userStorage.findById(userId).getFriends().add(friendId);
         }
 
-        if(optionalFriend.isEmpty()){
+        if (optionalFriend.isEmpty()) {
             Set<Long> beginningOfFriendList2 = new HashSet<>();
             beginningOfFriendList2.add(userId);
             userStorage.findById(friendId).setFriends(beginningOfFriendList2);
-        }else {
+        } else {
             userStorage.findById(friendId).getFriends().add(userId);
         }
     }
 
-    public void deleteFriend(long userId, long friendId){
+    public void deleteFriend(long userId, long friendId) {
         Optional<Set<Long>> optionalUser = Optional.ofNullable(userStorage.findById(userId).getFriends());
         Optional<Set<Long>> optionalFriend = Optional.ofNullable(userStorage.findById(friendId).getFriends());
 
-        if (optionalUser.isEmpty() && optionalFriend.isEmpty()){
+        if (optionalUser.isEmpty() && optionalFriend.isEmpty()) {
             throw new ObjectNotFoundException("Список друзей пуст, некого удалять.");
-        }else {
+        } else {
             userStorage.findById(userId).getFriends().remove(friendId);
             userStorage.findById(friendId).getFriends().remove(userId);
         }
     }
 
-    public Collection<User> getAllFriends(long id){
+    public Collection<User> getAllFriends(long id) {
         Set<User> usersFriends = new HashSet<>();
         User user = userStorage.findById(id);
-        for(Long idFriend : user.getFriends()){
+        for (Long idFriend : user.getFriends()) {
             usersFriends.add(userStorage.findById(idFriend));
         }
 
-        return  usersFriends
+        return usersFriends
                 .stream()
                 .sorted(Comparator.comparing(User::getId))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public Collection<User> getCommonFriends(Long userId, Long otherUserId){
+    public Collection<User> getCommonFriends(Long userId, Long otherUserId) {
         Optional<Set<Long>> optionalUser = Optional.ofNullable(userStorage.findById(userId).getFriends());
         Optional<Set<Long>> optionalOther = Optional.ofNullable(userStorage.findById(otherUserId).getFriends());
-        if(optionalUser.isPresent() && optionalOther.isPresent()){
+        if (optionalUser.isPresent() && optionalOther.isPresent()) {
             Set<User> users = new HashSet<>();
             Set<Long> usersCommon = userStorage
-                                        .findById(userId)
-                                        .getFriends()
-                                        .stream()
-                                        .filter(userStorage.findById(otherUserId).getFriends()::contains)
-                                        .collect(Collectors.toSet());
+                    .findById(userId)
+                    .getFriends()
+                    .stream()
+                    .filter(userStorage.findById(otherUserId).getFriends()::contains)
+                    .collect(Collectors.toSet());
 
-            for (Long commonId: usersCommon) {
+            for (Long commonId : usersCommon) {
                 users.add(userStorage.findById(commonId));
             }
 
             return users;
-        }else {
+        } else {
             return new HashSet<>();
         }
     }
 
-    public User getById(long id){
+    public User getById(long id) {
         return userStorage.findById(id);
     }
 
@@ -101,6 +101,6 @@ public class UserService {
     }
 
     public User update(User user) {
-       return userStorage.update(user);
+        return userStorage.update(user);
     }
 }
