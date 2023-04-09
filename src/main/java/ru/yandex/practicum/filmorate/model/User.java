@@ -7,10 +7,11 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 public class User {
-    private int id;
+    private long id;
     @NotBlank(message = "Поле эектронной почты не может быть пустым!")
     @Email(message = "Неверный формат электронной почты!")
     private String email;
@@ -20,4 +21,5 @@ public class User {
     @NotNull(message = "День рождения обязателен к заполнению.")
     @UserBirthdayConstraint
     private LocalDate birthday;
+    private Set<Long> friends;
 }
