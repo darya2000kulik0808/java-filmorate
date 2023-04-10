@@ -7,7 +7,10 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,54 +27,32 @@ public class FilmService {
     }
 
     public void increaseLikes(Long filmId, Long userId) {
-        Optional<Collection<Long>> optional = Optional.ofNullable(filmStorage.findById(filmId).getLikes());
-        if (optional.isEmpty()) {
+        Film film = filmStorage.findById(filmId);
+        Collection<Long> likes = film.getLikes();
+        if (likes == null) {
             Set<Long> setOfId = new HashSet<>();
             setOfId.add(userId);
-            filmStorage.findById(filmId).setLikes(setOfId);
+            film.setLikes(setOfId);
         } else {
-            filmStorage.findById(filmId).getLikes().add(userId);
+            likes.add(userId);
         }
     }
 
     public void decreaseLikes(Long filmId, Long userId) {
         User user = userStorage.findById(userId);
-        Optional<Collection<Long>> optional = Optional.ofNullable(filmStorage.findById(filmId).getLikes());
-        if (optional.isPresent()) {
-            filmStorage.findById(filmId).getLikes().remove(user.getId());
+        Film film = filmStorage.findById(filmId);
+        Set<Long> setOfLikes = film.getLikes();
+        if (setOfLikes != null) {
+            setOfLikes.remove(user.getId());
         }
     }
 
     public Collection<Film> findSomeFilmsByLikes(int count) {
-        Collection<Film> films = filmStorage.findAll();
-        Collection<Film> filmsWithLikes = new HashSet<>();
-        Collection<Film> filmsWithoutLikes = new HashSet<>();
-
-        for (Film film : films) {
-            Optional<Set<Long>> optional = Optional.ofNullable(film.getLikes());
-            if (optional.isPresent()) {
-                filmsWithLikes.add(film);
-            } else {
-                filmsWithoutLikes.add(film);
-            }
-        }
-
-        if (!filmsWithLikes.isEmpty()) {
-            Collection<Film> allFilms = filmsWithLikes
-                    .stream()
-                    .sorted(Comparator.comparing((Film f) -> f.getLikes().size()))
-                    .collect(Collectors.toCollection(ArrayList::new));
-            allFilms.addAll(filmsWithoutLikes);
-            return allFilms
-                    .stream()
-                    .limit(count)
-                    .collect(Collectors.toList());
-        } else {
-            return filmsWithoutLikes
-                    .stream()
-                    .limit(count)
-                    .collect(Collectors.toList());
-        }
+        return filmStorage.findAll()
+                .stream()
+                .sorted(Comparator.comparing((Film f) -> f.getLikes().size()).reversed())
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
     public Film getById(long id) {
