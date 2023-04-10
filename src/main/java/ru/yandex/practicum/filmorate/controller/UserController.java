@@ -69,8 +69,8 @@ public class UserController {
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public Collection<User> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
-        log.debug("Получен GET-запрос на получение списка общих друзей пользователя с id: {} - и пользователя с id: {}"
-                , id, otherId);
+        log.debug("Получен GET-запрос на получение списка общих друзей пользователя с id: {} - и пользователя с id: {}",
+                id, otherId);
         return userService.getCommonFriends(id, otherId);
     }
 }
