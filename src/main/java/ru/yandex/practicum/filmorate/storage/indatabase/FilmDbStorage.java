@@ -172,9 +172,9 @@ public class FilmDbStorage implements FilmStorage {
         String description = resultSet.getString("FILM_DESCRIPTION");
         LocalDate releaseDate = resultSet.getDate("FILM_RELEASE_DATE").toLocalDate();
         int duration = resultSet.getInt("FILM_DURATION");
-        long mpa_id = resultSet.getLong("FILM_MPA_ID");
+        long mpaId = resultSet.getLong("FILM_MPA_ID");
 
-        Mpa mpa = mpaStorage.getMpaById(mpa_id);
+        Mpa mpa = mpaStorage.getMpaById(mpaId);
         List<Genre> genreList = (List<Genre>) genreStorage.getAllGenresForFilm(id);
         Set<Long> likes = (Set<Long>) likesDbStorage.getLikes(id);
 
