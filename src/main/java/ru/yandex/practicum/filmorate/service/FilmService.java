@@ -1,50 +1,59 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.indatabase.LikesDbStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
 
     private final FilmStorage filmStorage;
-
-    private final UserStorage userStorage;
+    private final  LikesDbStorage likesDbStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage,
+                       @Qualifier("LikesDbStorage") LikesDbStorage likesDbStorage) {
         this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
+        this.likesDbStorage = likesDbStorage;
     }
 
     public void increaseLikes(Long filmId, Long userId) {
-        Film film = filmStorage.findById(filmId);
-        Collection<Long> likes = film.getLikes();
-        if (likes == null) {
-            Set<Long> setOfId = new HashSet<>();
-            setOfId.add(userId);
-            film.setLikes(setOfId);
-        } else {
-            likes.add(userId);
-        }
+        likesDbStorage.increaseLikes(userId, filmId);
+//        Optional<Film> filmOptional = Optional.ofNullable(filmStorage.findById(filmId));
+//
+//        if(filmOptional.isPresent()){
+//            Film film = filmOptional.get();
+//            Collection<Long> likes = film.getLikes();
+//            if (likes == null) {
+//                Set<Long> setOfId = new HashSet<>();
+//                setOfId.add(userId);
+//                film.setLikes(setOfId);
+//            } else {
+//                likes.add(userId);
+//            }
+//        }
     }
 
     public void decreaseLikes(Long filmId, Long userId) {
-        User user = userStorage.findById(userId);
-        Film film = filmStorage.findById(filmId);
-        Set<Long> setOfLikes = film.getLikes();
-        if (setOfLikes != null) {
-            setOfLikes.remove(user.getId());
-        }
+        likesDbStorage.decreaseLikes(userId, filmId);
+//        User user = userStorage.findById(userId);
+//        Optional<Film> filmOptional = Optional.ofNullable(filmStorage.findById(filmId));
+//
+//        if(filmOptional.isPresent()) {
+//            Film film = filmOptional.get();
+//            Set<Long> setOfLikes = film.getLikes();
+//            if (setOfLikes != null) {
+//                setOfLikes.remove(user.getId());
+//            }
+//        }
     }
 
     public Collection<Film> findSomeFilmsByLikes(int count) {

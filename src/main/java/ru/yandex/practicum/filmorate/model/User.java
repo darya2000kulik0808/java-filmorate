@@ -22,4 +22,13 @@ public class User {
     @UserBirthdayConstraint
     private LocalDate birthday;
     private Set<Long> friends;
+
+    public User(long id, String email, String login, String name, LocalDate birthday, Set<Long> friends) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+        this.friends = friends;
+    }
 }

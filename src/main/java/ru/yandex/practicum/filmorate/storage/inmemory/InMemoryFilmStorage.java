@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -58,7 +59,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public void delete(Film film) {
         if (films.containsKey(film.getId())) {
             films.remove(film.getId());
-            log.debug("Удален пользователь: {}", film);
+            log.debug("Удален фильм: {}", film);
         } else {
             throw new ObjectNotFoundException("Фильма с таким айди не существует.");
         }
