@@ -33,10 +33,14 @@ public class GenreDbStorage implements GenreStorage {
             log.info("Запрос к базе данных: добавление жанров для фильма.");
             String sql = "INSERT INTO GENRE_FILM(GF_FILM_ID, GF_GENRE_ID) " +
                     "VALUES(?, ?);";
-            jdbcTemplate.update(sql, filmId, genreId);
-            log.info("Добавили жанров для фильма.");
+            int rows = jdbcTemplate.update(sql, filmId, genreId);
+            if(rows != 0){
+                log.debug("Добавлены жанры для фильма с айди {}", filmId);
+            } else {
+                throw new ObjectNotFoundException("Жанры для фильма не были найдены или обновлены.");
+            }
         } catch (DataAccessException exception){
-            System.out.println(Arrays.toString(exception.getStackTrace()));
+            throw new NotInsertedException("Не удалось добавить жанры для фильма.");
         }
     }
 
@@ -44,10 +48,14 @@ public class GenreDbStorage implements GenreStorage {
         try {
             log.info("Запрос к базе данных: удаление жанра для фильма.");
             String sql = "DELETE FROM GENRE_FILM WHERE GF_FILM_ID = ? AND GF_GENRE_ID = ?;";
-            jdbcTemplate.update(sql, filmId, genreId);
-            log.info("Удалили жанр для фильма.");
+            int rows = jdbcTemplate.update(sql, filmId, genreId);
+            if(rows != 0){
+                log.debug("Удален жанр для фильма с айди {}", filmId);
+            } else {
+                throw new ObjectNotFoundException("Жанры для фильма не были найдены или удалены.");
+            }
         } catch (DataAccessException exception){
-            System.out.println(Arrays.toString(exception.getStackTrace()));
+            throw new ObjectNotFoundException("Не удалось удалить жанры для фильма.");
         }
     }
 
@@ -87,7 +95,7 @@ public class GenreDbStorage implements GenreStorage {
             log.info("Получили список жанров для фильма.");
             return genres;
         }catch (EmptyResultDataAccessException exception){
-            return new ArrayList<>();
+            throw new ObjectNotFoundException("Не найдены жанры для фильма с айди " + filmId);
         }
     }
 

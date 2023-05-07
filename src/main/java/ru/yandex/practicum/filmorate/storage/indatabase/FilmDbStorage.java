@@ -162,7 +162,7 @@ public class FilmDbStorage implements FilmStorage {
             log.info("Нашли фильм с айди {} : " + film, id);
             return film;
         } catch (DataRetrievalFailureException exception) {
-            throw new ObjectNotFoundException("Фильма с айди" + id + " не существует.");
+            throw new ObjectNotFoundException("Фильма с айди " + id + " не существует.");
         }
     }
 
