@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.indatabase.FriendshipDbStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
@@ -59,7 +58,7 @@ public class UserService {
 //        }
     }
 
-    public void approveFriendship(long userId, long friendId){
+    public void approveFriendship(long userId, long friendId) {
         friendshipDbStorage.approveFriendship(userId, friendId);
     }
 

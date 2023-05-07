@@ -17,7 +17,7 @@ import java.util.Collection;
 @Repository
 @Qualifier("MpaDbStorage")
 @Slf4j
-public class MpaDbStorage implements MpaStorage  {
+public class MpaDbStorage implements MpaStorage {
 
     JdbcTemplate jdbcTemplate;
 
@@ -49,7 +49,7 @@ public class MpaDbStorage implements MpaStorage  {
         }
     }
 
-    private Mpa makeMpa(ResultSet resultSet,  int rowNum) throws SQLException {
+    private Mpa makeMpa(ResultSet resultSet, int rowNum) throws SQLException {
         long id = resultSet.getLong("MPA_ID");
         String name = resultSet.getString("MPA_NAME");
         return new Mpa(id, name);

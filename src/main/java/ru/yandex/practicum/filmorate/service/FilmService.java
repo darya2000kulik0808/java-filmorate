@@ -4,19 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.indatabase.LikesDbStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
 
     private final FilmStorage filmStorage;
-    private final  LikesDbStorage likesDbStorage;
+    private final LikesDbStorage likesDbStorage;
 
     @Autowired
     public FilmService(@Qualifier("FilmDbStorage") FilmStorage filmStorage,

@@ -81,7 +81,7 @@ public class UserDbStorage implements UserStorage {
             int rows = jdbcTemplate.update(sql,
                     user.getEmail(), user.getLogin(), user.getName(),
                     user.getBirthday(), user.getId());
-            if(rows != 0){
+            if (rows != 0) {
                 log.debug("Обновлен пользователь: {}", user);
                 return user;
             } else {

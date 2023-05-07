@@ -43,7 +43,7 @@ public class FriendshipDbStorage {
 
     public void addFriendship(long userId, long friendId) {
         try {
-            if(userId < 0 || friendId < 0){
+            if (userId < 0 || friendId < 0) {
                 throw new ObjectNotFoundException("Пользователей с отрицательным айди не существует.");
             } else {
                 log.info("Запрос на добавление дружбы.");
@@ -73,7 +73,7 @@ public class FriendshipDbStorage {
         }
     }
 
-    public void deleteFriendship(long userId, long friendId){
+    public void deleteFriendship(long userId, long friendId) {
         try {
             log.info("Запрос на удаление дружбы.");
             String sql = "DELETE FROM FRIENDSHIP " +
@@ -86,6 +86,7 @@ public class FriendshipDbStorage {
             throw new NotInsertedException("Не удалось удалить дружбу.");
         }
     }
+
     protected Set<Long> filterFriends(long userId) {
         Collection<Friendship> friendships = findAllUserFriends(userId);
         Set<Long> friends = new HashSet<>();
@@ -104,7 +105,7 @@ public class FriendshipDbStorage {
         return friends;
     }
 
-    private Friendship makeFriendship(ResultSet resultSet,  int rowNum) throws SQLException {
+    private Friendship makeFriendship(ResultSet resultSet, int rowNum) throws SQLException {
         long userId = resultSet.getLong("USER_1_ID");
         long friendId = resultSet.getLong("USER_2_ID");
         boolean status = resultSet.getBoolean("FRIENDSHIP_STATUS");

@@ -13,8 +13,6 @@ import ru.yandex.practicum.filmorate.storage.interfaces.GenreStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 @Repository
@@ -28,45 +26,45 @@ public class GenreDbStorage implements GenreStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void addGenresToFilm(long filmId, long genreId){
+    public void addGenresToFilm(long filmId, long genreId) {
         try {
             log.info("Запрос к базе данных: добавление жанров для фильма.");
             String sql = "INSERT INTO GENRE_FILM(GF_FILM_ID, GF_GENRE_ID) " +
                     "VALUES(?, ?);";
             int rows = jdbcTemplate.update(sql, filmId, genreId);
-            if(rows != 0){
+            if (rows != 0) {
                 log.debug("Добавлены жанры для фильма с айди {}", filmId);
             } else {
                 throw new ObjectNotFoundException("Жанры для фильма не были найдены или обновлены.");
             }
-        } catch (DataAccessException exception){
+        } catch (DataAccessException exception) {
             throw new NotInsertedException("Не удалось добавить жанры для фильма.");
         }
     }
 
-    public void removeGenreForFilm(long filmId, long genreId){
+    public void removeGenreForFilm(long filmId, long genreId) {
         try {
             log.info("Запрос к базе данных: удаление жанра для фильма.");
             String sql = "DELETE FROM GENRE_FILM WHERE GF_FILM_ID = ? AND GF_GENRE_ID = ?;";
             int rows = jdbcTemplate.update(sql, filmId, genreId);
-            if(rows != 0){
+            if (rows != 0) {
                 log.debug("Удален жанр для фильма с айди {}", filmId);
             } else {
                 throw new ObjectNotFoundException("Жанры для фильма не были найдены или удалены.");
             }
-        } catch (DataAccessException exception){
+        } catch (DataAccessException exception) {
             throw new ObjectNotFoundException("Не удалось удалить жанры для фильма.");
         }
     }
 
     public Collection<Genre> getAllGenres() {
-        try{
+        try {
             log.info("Запрос к базе данных: получение всех жанров.");
             String sql = "SELECT * FROM GENRE;";
             Collection<Genre> genres = jdbcTemplate.query(sql, this::makeGenre);
             log.info("Получили список жанров.");
             return genres;
-        } catch (EmptyResultDataAccessException exception){
+        } catch (EmptyResultDataAccessException exception) {
             throw new ObjectNotFoundException("Жанры не найдены.");
         }
 
@@ -85,7 +83,7 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     public Collection<Genre> getAllGenresForFilm(long filmId) {
-        try{
+        try {
             log.info("Запрос к базе данных: получение жанров для фильма.");
             String sql = "SELECT G.GENRE_ID, G.GENRE_NAME " +
                     "FROM GENRE_FILM AS GF " +
@@ -94,12 +92,12 @@ public class GenreDbStorage implements GenreStorage {
             Collection<Genre> genres = jdbcTemplate.query(sql, (this::makeGenre), filmId);
             log.info("Получили список жанров для фильма.");
             return genres;
-        }catch (EmptyResultDataAccessException exception){
+        } catch (EmptyResultDataAccessException exception) {
             throw new ObjectNotFoundException("Не найдены жанры для фильма с айди " + filmId);
         }
     }
 
-    private Genre makeGenre(ResultSet resultSet,  int rowNum) throws SQLException {
+    private Genre makeGenre(ResultSet resultSet, int rowNum) throws SQLException {
         long id = resultSet.getLong("GENRE_ID");
         String name = resultSet.getString("GENRE_NAME");
         return new Genre(id, name);

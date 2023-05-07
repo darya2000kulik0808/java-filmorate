@@ -29,7 +29,7 @@ public class LikesDbStorage {
 
     protected Collection<Long> getLikes(long filmId) throws SQLException {
         try {
-            if(filmId < 0){
+            if (filmId < 0) {
                 throw new ObjectNotFoundException("Фильмов с отрицательным айди не существует.");
             } else {
                 log.info("Запрос к базе данных: получение лайков для фильма.");
@@ -52,7 +52,7 @@ public class LikesDbStorage {
 
     public void decreaseLikes(long userId, long filmId) {
         try {
-            if(userId < 0 || filmId < 0){
+            if (userId < 0 || filmId < 0) {
                 throw new ObjectNotFoundException("Фильмов с отрицательным айди не существует.");
             } else {
                 log.info("Запрос к базе данных: уменьшение (удаление) лайков для фильма.");
@@ -67,7 +67,7 @@ public class LikesDbStorage {
 
     public void increaseLikes(long userId, long filmId) {
         try {
-            if(userId < 0 || filmId < 0){
+            if (userId < 0 || filmId < 0) {
                 throw new ObjectNotFoundException("Фильмов с отрицательным айди не существует.");
             } else {
                 log.info("Запрос к базе данных: увеличение (добавление) лайков для фильма.");

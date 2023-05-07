@@ -94,7 +94,7 @@ public class FilmDbStorage implements FilmStorage {
                     "WHERE FILM_ID = ?;";
 
             Film filmBeforeUpdate = findById(film.getId());
-            if(Optional.ofNullable(filmBeforeUpdate.getGenres()).isPresent()){
+            if (Optional.ofNullable(filmBeforeUpdate.getGenres()).isPresent()) {
                 Set<Genre> diff = filmBeforeUpdate.getGenres().stream()
                         .filter(i -> !film.getGenres().contains(i))
                         .collect(Collectors.toSet());
@@ -102,7 +102,7 @@ public class FilmDbStorage implements FilmStorage {
             }
 
             Optional<List<Genre>> genres = Optional.ofNullable(film.getGenres());
-            if(genres.isPresent()){
+            if (genres.isPresent()) {
                 Set<Genre> diff = genres.get().stream()
                         .filter(i -> !filmBeforeUpdate.getGenres().contains(i))
                         .collect(Collectors.toSet());
