@@ -113,18 +113,18 @@ class FilmorateApplicationTests {
 	@Test
 	@Order(6)
 	public void testFindAllMpa() {
-		Collection<Mpa> mpas = new ArrayList<>();
-		mpas.add(new Mpa(1, "G"));
-		mpas.add(new Mpa(2, "PG"));
-		mpas.add(new Mpa(3, "PG-13"));
-		mpas.add(new Mpa(4, "R"));
-		mpas.add(new Mpa(5, "NC-17"));
+		Collection<Mpa> mpasArray = new ArrayList<>();
+		mpasArray.add(new Mpa(1, "G"));
+		mpasArray.add(new Mpa(2, "PG"));
+		mpasArray.add(new Mpa(3, "PG-13"));
+		mpasArray.add(new Mpa(4, "R"));
+		mpasArray.add(new Mpa(5, "NC-17"));
 
-		Optional<Collection<Mpa>> userOptional = Optional.ofNullable(mpaStorage.getAllMpa());
+		Optional<Collection<Mpa>> mpas = Optional.ofNullable(mpaStorage.getAllMpa());
 
-		assertThat(userOptional)
+		assertThat(mpas)
 				.isPresent()
-				.isEqualTo(Optional.of(mpas));
+				.isEqualTo(Optional.of(mpasArray));
 	}
 
 	@Test

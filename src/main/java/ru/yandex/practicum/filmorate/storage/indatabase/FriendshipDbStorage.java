@@ -5,11 +5,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.ResultSetWrappingSqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotInsertedException;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.Friendship;
 
+import javax.sql.rowset.CachedRowSet;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -45,16 +47,41 @@ public class FriendshipDbStorage {
         try {
             if (userId < 0 || friendId < 0) {
                 throw new ObjectNotFoundException("Пользователей с отрицательным айди не существует.");
-            } else {
-                log.info("Запрос на добавление дружбы.");
-                String sql = "INSERT INTO FRIENDSHIP(USER_1_ID, USER_2_ID, FRIENDSHIP_STATUS) " +
-                        "VALUES(?, ?, ?);";
-
-                jdbcTemplate.update(sql, userId, friendId, false);
-                log.info("Добавили запрос на дружбу для пользователя с айди {}" +
-                        " от пользователя с айди {}", friendId, userId);
             }
-        } catch (DataAccessException exception) {
+            if (userId == friendId) {
+                throw new NotInsertedException("Нельзя добавить самого себя в друзья.");
+            } else {
+                String sqlCheckExistingFriendship = "SELECT * " +
+                        "FROM FRIENDSHIP AS F " +
+                        "WHERE (F.USER_1_ID = ? AND F.USER_2_ID = ?);";
+
+                ResultSetWrappingSqlRowSet rowSet1 =
+                        (ResultSetWrappingSqlRowSet) jdbcTemplate.queryForRowSet(
+                                sqlCheckExistingFriendship,
+                                userId, friendId);
+                CachedRowSet crs1 = (CachedRowSet) rowSet1.getResultSet();
+
+                ResultSetWrappingSqlRowSet rowSet2 =
+                        (ResultSetWrappingSqlRowSet) jdbcTemplate.queryForRowSet(
+                                sqlCheckExistingFriendship,
+                                friendId, userId);
+                CachedRowSet crs2 = (CachedRowSet) rowSet2.getResultSet();
+
+                if (crs1.next()) {
+                    approveFriendship(userId, friendId);
+                } else if (crs2.next()) {
+                    approveFriendship(friendId, userId);
+                } else {
+                    log.info("Запрос на добавление дружбы.");
+                    String sql = "INSERT INTO FRIENDSHIP(USER_1_ID, USER_2_ID, FRIENDSHIP_STATUS) " +
+                            "VALUES(?, ?, ?);";
+
+                    jdbcTemplate.update(sql, userId, friendId, false);
+                    log.info("Добавили запрос на дружбу для пользователя с айди {}" +
+                            " от пользователя с айди {}", friendId, userId);
+                }
+            }
+        } catch (SQLException | DataAccessException exception) {
             throw new NotInsertedException("Не удалось добавить дружбу.");
         }
     }
@@ -65,7 +92,7 @@ public class FriendshipDbStorage {
             String sql = "UPDATE FRIENDSHIP SET FRIENDSHIP_STATUS = TRUE " +
                     "WHERE USER_1_ID = ? AND USER_2_ID = ?;";
 
-            jdbcTemplate.update(sql, friendId, userId);
+            jdbcTemplate.update(sql, userId, friendId);
             log.info("Обновили дружбу для пользователей с айди {}" +
                     " и {}", friendId, userId);
         } catch (DataAccessException exception) {

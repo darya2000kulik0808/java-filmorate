@@ -58,10 +58,6 @@ public class UserService {
 //        }
     }
 
-    public void approveFriendship(long userId, long friendId) {
-        friendshipDbStorage.approveFriendship(userId, friendId);
-    }
-
     public Collection<User> getAllFriends(long id) {
         Set<User> usersFriends = new HashSet<>();
         User user = userStorage.findById(id);

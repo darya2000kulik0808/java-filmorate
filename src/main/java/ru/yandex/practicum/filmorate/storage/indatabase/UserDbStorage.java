@@ -3,12 +3,13 @@ package ru.yandex.practicum.filmorate.storage.indatabase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.NotInsertedException;
+import ru.yandex.practicum.filmorate.exception.ObjectAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
@@ -65,8 +66,8 @@ public class UserDbStorage implements UserStorage {
 
             log.info("Добавили пользователя {}", user);
             return user;
-        } catch (DataAccessException exception) {
-            throw new NotInsertedException("Не удалось добавить пользователя.");
+        } catch (DuplicateKeyException exception) {
+            throw new ObjectAlreadyExistsException("Пользователь уже существует.");
         }
     }
 
@@ -87,8 +88,8 @@ public class UserDbStorage implements UserStorage {
             } else {
                 throw new ObjectNotFoundException("Пользовтаель не был найден или обновлен.");
             }
-        } catch (DataAccessException exception) {
-            throw new ObjectNotFoundException("Не удалось обновить пользователя.");
+        } catch (DuplicateKeyException exception) {
+            throw new ObjectAlreadyExistsException("Пользователь уже существует.");
         }
     }
 

@@ -60,7 +60,8 @@ public class GenreDbStorage implements GenreStorage {
     public Collection<Genre> getAllGenres() {
         try {
             log.info("Запрос к базе данных: получение всех жанров.");
-            String sql = "SELECT * FROM GENRE;";
+            String sql = "SELECT * FROM GENRE" +
+                    " ORDER BY GENRE_ID;";
             Collection<Genre> genres = jdbcTemplate.query(sql, this::makeGenre);
             log.info("Получили список жанров.");
             return genres;

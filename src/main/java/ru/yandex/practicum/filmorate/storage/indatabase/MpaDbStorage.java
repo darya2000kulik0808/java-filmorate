@@ -28,7 +28,8 @@ public class MpaDbStorage implements MpaStorage {
     public Collection<Mpa> getAllMpa() {
         try {
             log.info("Запрос к базе данных: получение всех рейтингов MPA.");
-            String sql = "SELECT * FROM MPA;";
+            String sql = "SELECT * FROM MPA" +
+                    " ORDER BY MPA_ID;";
             Collection<Mpa> mpa = jdbcTemplate.query(sql, this::makeMpa);
             log.info("Получили все MPA.");
             return mpa;

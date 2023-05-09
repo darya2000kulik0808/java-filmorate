@@ -3,14 +3,15 @@ package ru.yandex.practicum.filmorate.storage.indatabase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotInsertedException;
+import ru.yandex.practicum.filmorate.exception.ObjectAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -51,12 +52,25 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
         try {
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            long filmId;
+            Collection<Long> genresIds = new ArrayList<>();
+
             log.info("Запрос к базе данных: создание фильма.");
             String sql = "INSERT INTO FILM(FILM_NAME, FILM_DESCRIPTION," +
                     " FILM_RELEASE_DATE, FILM_DURATION, FILM_MPA_ID)" +
                     "VALUES(?, ?, ?, ?, ?);";
 
-            KeyHolder keyHolder = new GeneratedKeyHolder();
+            if (Optional.ofNullable(film.getGenres()).isPresent()) {
+                genreStorage.getAllGenres()
+                        .forEach(genre -> genresIds.add(genre.getId()));
+                for (Genre genre : film.getGenres()) {
+                    if (!genresIds.contains(genre.getId())) {
+                        throw new ObjectNotFoundException("Невозможно добавить несуществующий жанр к фильму");
+                    }
+                }
+            }
+
             jdbcTemplate.update(connection -> {
                 PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"FILM_ID"});
                 stmt.setString(1, film.getName());
@@ -68,7 +82,7 @@ public class FilmDbStorage implements FilmStorage {
             }, keyHolder);
 
             log.info("Получаем айди добавленного фильма...");
-            long filmId = Objects.requireNonNull(keyHolder.getKey()).longValue();
+            filmId = Objects.requireNonNull(keyHolder.getKey()).longValue();
 
             if (Optional.ofNullable(film.getGenres()).isPresent()) {
                 log.info("Добавляем жанры...");
@@ -79,8 +93,10 @@ public class FilmDbStorage implements FilmStorage {
             Film createdFilm = findById(filmId);
             log.info("Добавили фильм {}", createdFilm);
             return createdFilm;
-        } catch (DataAccessException exception) {
+        } catch (NotInsertedException exception) {
             throw new NotInsertedException("Не удалось добавить фильм.");
+        } catch (DuplicateKeyException exception) {
+            throw new ObjectAlreadyExistsException("Фильм уже существует.");
         }
     }
 
