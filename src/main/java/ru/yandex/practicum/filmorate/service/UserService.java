@@ -1,9 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.indatabase.FriendshipDbStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 import java.util.*;
@@ -13,44 +14,48 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserStorage userStorage;
+    private final FriendshipDbStorage friendshipDbStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("UserDbStorage") UserStorage userStorage,
+                       @Qualifier("FriendshipDbStorage") FriendshipDbStorage friendshipDbStorage) {
         this.userStorage = userStorage;
+        this.friendshipDbStorage = friendshipDbStorage;
     }
 
     public void addFriend(long userId, long friendId) {
-        Optional<Set<Long>> optionalUser = Optional.ofNullable(userStorage.findById(userId).getFriends());
-        Optional<Set<Long>> optionalFriend = Optional.ofNullable(userStorage.findById(friendId).getFriends());
-
-        if (optionalUser.isEmpty()) {
-
-            Set<Long> beginningOfFriendList1 = new HashSet<>();
-            beginningOfFriendList1.add(friendId);
-            userStorage.findById(userId).setFriends(beginningOfFriendList1);
-        } else {
-            userStorage.findById(userId).getFriends().add(friendId);
-        }
-
-        if (optionalFriend.isEmpty()) {
-            Set<Long> beginningOfFriendList2 = new HashSet<>();
-            beginningOfFriendList2.add(userId);
-            userStorage.findById(friendId).setFriends(beginningOfFriendList2);
-        } else {
-            userStorage.findById(friendId).getFriends().add(userId);
-        }
+        friendshipDbStorage.addFriendship(userId, friendId);
+//        User user = userStorage.findById(userId);
+//        User friend = userStorage.findById(friendId);
+//
+//        if (user.getFriends() == null) {
+//            Set<Long> beginningOfFriendList1 = new HashSet<>();
+//            beginningOfFriendList1.add(friendId);
+//            user.setFriends(beginningOfFriendList1);
+//        } else {
+//            user.getFriends().add(friendId);
+//        }
+//
+//        if (friend.getFriends() == null) {
+//            Set<Long> beginningOfFriendList2 = new HashSet<>();
+//            beginningOfFriendList2.add(userId);
+//            friend.setFriends(beginningOfFriendList2);
+//        } else {
+//            friend.getFriends().add(userId);
+//        }
     }
 
     public void deleteFriend(long userId, long friendId) {
-        Optional<Set<Long>> optionalUser = Optional.ofNullable(userStorage.findById(userId).getFriends());
-        Optional<Set<Long>> optionalFriend = Optional.ofNullable(userStorage.findById(friendId).getFriends());
-
-        if (optionalUser.isEmpty() && optionalFriend.isEmpty()) {
-            throw new ObjectNotFoundException("Список друзей пуст, некого удалять.");
-        } else {
-            userStorage.findById(userId).getFriends().remove(friendId);
-            userStorage.findById(friendId).getFriends().remove(userId);
-        }
+        friendshipDbStorage.deleteFriendship(userId, friendId);
+//        User user = userStorage.findById(userId);
+//        User friend = userStorage.findById(friendId);
+//
+//        if (user.getFriends() != null && friend.getFriends() != null) {
+//            user.getFriends().remove(friendId);
+//            friend.getFriends().remove(userId);
+//        } else {
+//            throw new ObjectNotFoundException("Список друзей пуст, некого удалять.");
+//        }
     }
 
     public Collection<User> getAllFriends(long id) {
@@ -67,15 +72,15 @@ public class UserService {
     }
 
     public Collection<User> getCommonFriends(Long userId, Long otherUserId) {
-        Optional<Set<Long>> optionalUser = Optional.ofNullable(userStorage.findById(userId).getFriends());
-        Optional<Set<Long>> optionalOther = Optional.ofNullable(userStorage.findById(otherUserId).getFriends());
-        if (optionalUser.isPresent() && optionalOther.isPresent()) {
+        User user1 = userStorage.findById(userId);
+        User user2 = userStorage.findById(otherUserId);
+
+        if (user1.getFriends() != null && user2.getFriends() != null) {
             Set<User> users = new HashSet<>();
-            Set<Long> usersCommon = userStorage
-                    .findById(userId)
+            Set<Long> usersCommon = user1
                     .getFriends()
                     .stream()
-                    .filter(userStorage.findById(otherUserId).getFriends()::contains)
+                    .filter(user2.getFriends()::contains)
                     .collect(Collectors.toSet());
 
             for (Long commonId : usersCommon) {
